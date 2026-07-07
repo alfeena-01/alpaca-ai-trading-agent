@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Prediction System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-heartbeat"></i>
+                    <h1>CardioPredict</h1>
+                </div>
+                <p class="tagline">Advanced Heart Disease Risk Assessment</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2><i class="fas fa-clipboard-check"></i> Patient Health Assessment</h2>
+                    <p>Enter patient information to predict heart disease risk</p>
+                </div>
+
+                <form method="POST" action="/predict" class="health-form">
+                    <!-- Demographic Section -->
+                    <fieldset class="form-section">
+                        <legend><i class="fas fa-user"></i> Demographic Information</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="age">Age (years)</label>
+                                <input type="number" id="age" name="age" min="18" max="120" placeholder="e.g., 45" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sex">Sex</label>
+                                <select id="sex" name="sex" required>
+                                    <option value="">Select gender</option>
+                                    <option value="0">Female (0)</option>
+                                    <option value="1">Male (1)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Cardiac History Section -->
+                    <fieldset class="form-section">
+                        <legend><i class="fas fa-heart"></i> Cardiac Symptoms & History</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cp">Chest Pain Type</label>
+                                <select id="cp" name="cp" required>
+                                    <option value="">Select type</option>
+                                    <option value="0">Typical Angina (0)</option>
+                                    <option value="1">Atypical Angina (1)</option>
+                                    <option value="2">Non-anginal Pain (2)</option>
+                                    <option value="3">Asymptomatic (3)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exang">Exercise Induced Angina</label>
+                                <select id="exang" name="exang" required>
+                                    <option value="">Select option</option>
+                                    <option value="0">No (0)</option>
+                                    <option value="1">Yes (1)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Blood Pressure & Cholesterol Section -->
+                    <fieldset class="form-section">
+                        <legend><i class="fas fa-tint"></i> Blood Pressure & Cholesterol</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="trestbps">Resting Blood Pressure (mmHg)</label>
+                                <input type="number" id="trestbps" name="trestbps" min="0" placeholder="e.g., 120" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="chol">Serum Cholesterol (mg/dl)</label>
+                                <input type="number" id="chol" name="chol" min="0" placeholder="e.g., 200" required>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Blood Sugar & ECG Section -->
+                    <fieldset class="form-section">
+                        <legend><i class="fas fa-flask"></i> Metabolic & Electrical Indicators</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fbs">Fasting Blood Sugar > 120 mg/dl</label>
+                                <select id="fbs" name="fbs" required>
+                                    <option value="">Select option</option>
+                                    <option value="0">No (0)</option>
+                                    <option value="1">Yes (1)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="restecg">Resting Electrocardiogram</label>
+                                <select id="restecg" name="restecg" required>
+                                    <option value="">Select type</option>
+                                    <option value="0">Normal (0)</option>
+                                    <option value="1">ST Abnormality (1)</option>
+                                    <option value="2">LV Hypertrophy (2)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Heart Rate & ST Segment Section -->
+                    <fieldset class="form-section">
+                        <legend><i class="fas fa-pulse"></i> Heart Rate & ST Segment</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="thalach">Maximum Heart Rate Achieved (bpm)</label>
+                                <input type="number" id="thalach" name="thalach" min="0" max="250" placeholder="e.g., 150" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="oldpeak">ST Depression (Induced by Exercise)</label>
+                                <input type="number" id="oldpeak" name="oldpeak" step="0.1" min="0" placeholder="e.g., 2.5" required>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Advanced Indicators Section -->
+                    <fieldset class="form-section">
+                        <legend><i class="fas fa-stethoscope"></i> Advanced Cardiac Indicators</legend>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="slope">ST Segment Slope</label>
+                                <select id="slope" name="slope" required>
+                                    <option value="">Select slope</option>
+                                    <option value="0">Upsloping (0)</option>
+                                    <option value="1">Flat (1)</option>
+                                    <option value="2">Downsloping (2)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ca">Number of Major Vessels</label>
+                                <select id="ca" name="ca" required>
+                                    <option value="">Select number</option>
+                                    <option value="0">0 vessels (0)</option>
+                                    <option value="1">1 vessel (1)</option>
+                                    <option value="2">2 vessels (2)</option>
+                                    <option value="3">3 vessels (3)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="thal">Thalassemia</label>
+                                <select id="thal" name="thal" required>
+                                    <option value="">Select type</option>
+                                    <option value="0">Normal (0)</option>
+                                    <option value="1">Fixed Defect (1)</option>
+                                    <option value="2">Reversible Defect (2)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Submit Button -->
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-brain"></i> Predict Risk
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Result Section -->
+                {% if prediction %}
+                <div class="result-section {% if '⚠️' in prediction %}result-warning{% else %}result-success{% endif %}">
+                    <div class="result-content">
+                        {% if '⚠️' in prediction %}
+                        <div class="result-icon warning-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>⚠️ High Risk Alert</h3>
+                        {% else %}
+                        <div class="result-icon success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>✅ Low Risk</h3>
+                        {% endif %}
+                        <p class="result-message">{{ prediction }}</p>
+                        <p class="result-note">💡 <strong>Disclaimer:</strong> This prediction is based on machine learning models and should not be considered as medical advice. Always consult with a qualified healthcare professional for accurate diagnosis.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Info Card -->
+            <aside class="info-card">
+                <h3><i class="fas fa-info-circle"></i> About This System</h3>
+                <p>This prediction system uses a Gaussian Naive Bayes machine learning model trained on historical heart disease data to estimate the risk of heart disease based on patient health metrics.</p>
+                <div class="info-item">
+                    <strong>Model:</strong> Gaussian Naive Bayes
+                </div>
+                <div class="info-item">
+                    <strong>Data Source:</strong> UCI Heart Disease Dataset
+                </div>
+                <div class="info-item">
+                    <strong>Accuracy:</strong> High on validation set
+                </div>
+            </aside>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 CardioPredict. All rights reserved. | <strong>Medical Disclaimer:</strong> For educational and research purposes only.</p>
+        </footer>
+    </div>
+</body>
+
+</html>
