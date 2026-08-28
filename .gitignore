@@ -1,5 +1,14 @@
+# Virtual environments
 venv/
+.venv/
+env/
+
+# Python cache
 __pycache__/
 *.pyc
-.env
+
+# Jupyter notebook checkpoints
 .ipynb_checkpoints/
+
+# Environment variables / secrets
+.env
