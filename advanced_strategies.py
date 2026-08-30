@@ -5,7 +5,10 @@ Contains additional strategy implementations for different market conditions.
 
 import pandas as pd
 import numpy as np
-from ta import momentum, trend, volatility
+try:
+    from ta import momentum, trend, volatility
+except ImportError:
+    momentum = trend = volatility = None
 
 
 class AdvancedStrategies:
