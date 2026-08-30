@@ -30,10 +30,18 @@ class AdvancedStrategies:
             current_price = closes.iloc[-1]
             
             # Calculate Bollinger Bands
-            bb = volatility.BollingerBands(close=closes, window=20, window_dev=2)
-            upper_band = bb.bollinger_hband().iloc[-1]
-            lower_band = bb.bollinger_lband().iloc[-1]
-            middle_band = bb.bollinger_mavg().iloc[-1]
+            if volatility is not None:
+                bb = volatility.BollingerBands(close=closes, window=20, window_dev=2)
+                upper_band = bb.bollinger_hband().iloc[-1]
+                lower_band = bb.bollinger_lband().iloc[-1]
+            else:
+                # Fallback
+                middle = closes.rolling(window=20).mean().iloc[-1]
+                std = closes.rolling(window=20).std().iloc[-1]
+                upper_band = middle + (std * 2)
+                lower_band = middle - (std * 2)
+            
+            middle_band = closes.rolling(20).mean().iloc[-1]
             
             # Signal generation
             if current_price < lower_band:
