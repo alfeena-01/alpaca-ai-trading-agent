@@ -84,12 +84,27 @@ class AdvancedStrategies:
             current_price = closes.iloc[-1]
             
             # RSI
-            rsi = momentum.RSIIndicator(close=closes, window=14).rsi()
-            current_rsi = rsi.iloc[-1]
+            if momentum is not None:
+                rsi = momentum.RSIIndicator(close=closes, window=14).rsi()
+                current_rsi = rsi.iloc[-1]
+            else:
+                # Fallback RSI
+                deltas = closes.diff()
+                seed = deltas[:14+1]
+                up = seed[seed >= 0].sum() / 14
+                down = -seed[seed < 0].sum() / 14
+                rs = up / down if down != 0 else 0
+                current_rsi = 100. - 100. / (1. + rs)
             
             # MACD
-            macd = trend.MACD(close=closes, window_fast=12, window_slow=26, window_sign=9)
-            macd_diff = macd.macd_diff().iloc[-1]
+            if trend is not None:
+                macd = trend.MACD(close=closes, window_fast=12, window_slow=26, window_sign=9)
+                macd_diff = macd.macd_diff().iloc[-1]
+            else:
+                # Fallback
+                ema_fast = closes.ewm(span=12).mean().iloc[-1]
+                ema_slow = closes.ewm(span=26).mean().iloc[-1]
+                macd_diff = ema_fast - ema_slow
             
             # Signal generation
             if current_rsi < 30 and macd_diff > 0:
