@@ -5,3 +5,7 @@
 --- Market Check #1 ---
 2026-08-30 14:20:59,682 - __main__ - INFO - Daily P&L: $0.00
 2026-08-30 14:20:59,683 - __main__ - INFO - Waiting 60s for next check...
+2026-08-30 14:21:59,684 - __main__ - INFO - 
+--- Market Check #2 ---
+2026-08-30 14:22:00,711 - __main__ - INFO - Daily P&L: $0.00
+2026-08-30 14:22:00,712 - __main__ - INFO - Waiting 60s for next check...
