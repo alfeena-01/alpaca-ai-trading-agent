@@ -90,7 +90,8 @@ def check_python_files():
     all_ok = True
     for file in files:
         try:
-            compile(open(file).read(), file, 'exec')
+            with open(file, 'r', encoding='utf-8') as f:
+                compile(f.read(), file, 'exec')
             print(f"✓ {file} syntax OK")
         except SyntaxError as e:
             print(f"✗ {file} has syntax errors: {e}")
