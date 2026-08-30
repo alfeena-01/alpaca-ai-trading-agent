@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from ta import momentum, trend, volatility
 from datetime import datetime, timedelta
-s
+
 
 class TradingStrategy:
     """Options and stock trading strategy with technical analysis."""
