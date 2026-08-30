@@ -5,7 +5,11 @@ Incorporates technical analysis and risk management.
 
 import pandas as pd
 import numpy as np
-from ta import momentum, trend, volatility
+try:
+    from ta import momentum, trend, volatility
+except ImportError:
+    # Fallback if ta-lib not available - use built-in calculations
+    momentum = trend = volatility = None
 from datetime import datetime, timedelta
 
 
@@ -27,32 +31,63 @@ class TradingStrategy:
     def calculate_rsi(self, prices, period=14):
         """Calculate Relative Strength Index."""
         try:
-            rsi = momentum.RSIIndicator(close=prices, window=period).rsi()
-            return rsi.iloc[-1] if len(rsi) > 0 else None
+            if momentum is not None:
+                rsi = momentum.RSIIndicator(close=prices, window=period).rsi()
+                return rsi.iloc[-1] if len(rsi) > 0 else None
+            else:
+                # Fallback calculation
+                deltas = prices.diff()
+                seed = deltas[:period+1]
+                up = seed[seed >= 0].sum() / period
+                down = -seed[seed < 0].sum() / period
+                rs = up / down if down != 0 else 0
+                rsi = 100. - 100. / (1. + rs)
+                return rsi
         except:
             return None
     
     def calculate_macd(self, prices, fast=12, slow=26, signal=9):
         """Calculate MACD indicator."""
         try:
-            macd = trend.MACD(close=prices, window_fast=fast, window_slow=slow, window_sign=signal)
-            return {
-                'macd': macd.macd().iloc[-1],
-                'signal': macd.macd_signal().iloc[-1],
-                'histogram': macd.macd_diff().iloc[-1]
-            }
+            if trend is not None:
+                macd = trend.MACD(close=prices, window_fast=fast, window_slow=slow, window_sign=signal)
+                return {
+                    'macd': macd.macd().iloc[-1],
+                    'signal': macd.macd_signal().iloc[-1],
+                    'histogram': macd.macd_diff().iloc[-1]
+                }
+            else:
+                # Fallback calculation
+                ema_fast = prices.ewm(span=fast).mean().iloc[-1]
+                ema_slow = prices.ewm(span=slow).mean().iloc[-1]
+                macd_val = ema_fast - ema_slow
+                return {
+                    'macd': macd_val,
+                    'signal': macd_val,  # Simplified
+                    'histogram': 0
+                }
         except:
             return None
     
     def calculate_bollinger_bands(self, prices, period=20, num_std=2):
         """Calculate Bollinger Bands."""
         try:
-            bb = volatility.BollingerBands(close=prices, window=period, window_dev=num_std)
-            return {
-                'upper': bb.bollinger_hband().iloc[-1],
-                'middle': bb.bollinger_mavg().iloc[-1],
-                'lower': bb.bollinger_lband().iloc[-1]
-            }
+            if volatility is not None:
+                bb = volatility.BollingerBands(close=prices, window=period, window_dev=num_std)
+                return {
+                    'upper': bb.bollinger_hband().iloc[-1],
+                    'middle': bb.bollinger_mavg().iloc[-1],
+                    'lower': bb.bollinger_lband().iloc[-1]
+                }
+            else:
+                # Fallback calculation
+                middle = prices.rolling(window=period).mean().iloc[-1]
+                std = prices.rolling(window=period).std().iloc[-1]
+                return {
+                    'upper': middle + (std * num_std),
+                    'middle': middle,
+                    'lower': middle - (std * num_std)
+                }
         except:
             return None
     
