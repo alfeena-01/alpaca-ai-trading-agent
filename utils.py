@@ -4,6 +4,7 @@ Utility functions for trading operations, data retrieval, and risk management.
 
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 import pandas as pd
 from alpaca_trade_api import REST
 from dotenv import load_dotenv
@@ -14,11 +15,15 @@ class AlpacaAPI:
     
     def __init__(self):
         """Initialize Alpaca API with environment variables."""
-        load_dotenv()
+        env_path = Path(__file__).resolve().parent / ".env"
+        load_dotenv(dotenv_path=env_path, override=True)
+        base_url = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets").rstrip("/")
+        if base_url.endswith("/v2"):
+            base_url = base_url[:-3]
         self.api = REST(
             os.getenv("APCA_API_KEY_ID"),
             os.getenv("APCA_API_SECRET_KEY"),
-            os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
+            base_url
         )
     
     def get_account_info(self):
@@ -31,7 +36,7 @@ class AlpacaAPI:
                 'equity': float(account.equity),
                 'multiplier': float(account.multiplier),
                 'portfolio_value': float(account.portfolio_value),
-                'cash_withdrawable': float(account.cash_withdrawable)
+                'cash_withdrawable': float(getattr(account, 'cash_withdrawable', account.cash))
             }
         except Exception as e:
             print(f"Error fetching account info: {e}")
