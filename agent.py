@@ -84,7 +84,10 @@ class AutonomousTradingAgent:
                 if signal and signal['signal'] != 'HOLD':
                     signals[symbol] = signal
                     logger.info(f"{symbol}: {signal['signal']} "
-                               f"(confidence: {signal['confidence']:.2f})")
+                               f"(confidence: {signal['confidence']:.2f}, "
+                               f"AI: {signal.get('ai_reason', 'approved')})")
+                elif signal and signal.get('ai_reason'):
+                    logger.info(f"{symbol}: NO_TRADE ({signal['ai_reason']})")
             
             except Exception as e:
                 logger.error(f"Error analyzing {symbol}: {e}")

@@ -5,6 +5,7 @@ Incorporates technical analysis and risk management.
 
 import pandas as pd
 import numpy as np
+from ai_guard import AINoiseGate
 try:
     from ta import momentum, trend, volatility
 except ImportError:
@@ -27,6 +28,7 @@ class TradingStrategy:
         self.risk_tolerance = risk_tolerance
         self.min_confidence = min_confidence
         self.current_signals = {}
+        self.ai_gate = AINoiseGate(min_confidence=0.62)
     
     def calculate_rsi(self, prices, period=14):
         """Calculate Relative Strength Index."""
@@ -158,24 +160,58 @@ class TradingStrategy:
             # Generate signal based on trend score
             if trend_score > self.min_confidence:
                 confidence = min(trend_score, 1.0)
+                proposed_signal = 'BUY_CALL'
+                ai_decision = self.ai_gate.decide(bars_df, proposed_signal)
+                if ai_decision.action == 'NO_TRADE':
+                    return {
+                        'symbol': symbol,
+                        'signal': 'HOLD',
+                        'confidence': ai_decision.confidence,
+                        'trend_score': trend_score,
+                        'ai_regime': ai_decision.regime,
+                        'ai_reason': ai_decision.reason,
+                        'timestamp': datetime.now(),
+                        'position_size': 0
+                    }
                 return {
                     'symbol': symbol,
-                    'signal': 'BUY_CALL',  # Bullish signal
-                    'confidence': confidence,
+                    'signal': proposed_signal,
+                    'confidence': min(confidence, ai_decision.confidence),
                     'trend_score': trend_score,
+                    'ai_regime': ai_decision.regime,
+                    'ai_reason': ai_decision.reason,
                     'timestamp': datetime.now(),
-                    'position_size': self._calculate_position_size(confidence, account_equity)
+                    'position_size': self._calculate_position_size(
+                        min(confidence, ai_decision.confidence), account_equity
+                    )
                 }
             
             elif trend_score < -self.min_confidence:
                 confidence = min(abs(trend_score), 1.0)
+                proposed_signal = 'BUY_PUT'
+                ai_decision = self.ai_gate.decide(bars_df, proposed_signal)
+                if ai_decision.action == 'NO_TRADE':
+                    return {
+                        'symbol': symbol,
+                        'signal': 'HOLD',
+                        'confidence': ai_decision.confidence,
+                        'trend_score': trend_score,
+                        'ai_regime': ai_decision.regime,
+                        'ai_reason': ai_decision.reason,
+                        'timestamp': datetime.now(),
+                        'position_size': 0
+                    }
                 return {
                     'symbol': symbol,
-                    'signal': 'BUY_PUT',  # Bearish signal
-                    'confidence': confidence,
+                    'signal': proposed_signal,
+                    'confidence': min(confidence, ai_decision.confidence),
                     'trend_score': trend_score,
+                    'ai_regime': ai_decision.regime,
+                    'ai_reason': ai_decision.reason,
                     'timestamp': datetime.now(),
-                    'position_size': self._calculate_position_size(confidence, account_equity)
+                    'position_size': self._calculate_position_size(
+                        min(confidence, ai_decision.confidence), account_equity
+                    )
                 }
             
             else:
@@ -184,6 +220,8 @@ class TradingStrategy:
                     'signal': 'HOLD',
                     'confidence': 0,
                     'trend_score': trend_score,
+                    'ai_regime': 'not_needed',
+                    'ai_reason': 'Base technical signal did not reach the trade threshold',
                     'timestamp': datetime.now(),
                     'position_size': 0
                 }
