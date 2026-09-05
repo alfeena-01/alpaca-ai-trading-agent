@@ -5,7 +5,7 @@ Executes options and stock trading strategies with risk management.
 
 import os
 import time
-import 
+import logging
 from datetime import datetime
 from dotenv import load_dotenv
 from strategy import TradingStrategy
