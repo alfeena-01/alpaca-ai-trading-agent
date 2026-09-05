@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import os
 from utils import AlpacaAPI, DataLogger
-from strategy import 
+from strategy import TradingStrategy
 
 # Page configuration
 st.set_page_config(
